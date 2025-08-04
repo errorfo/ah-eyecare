@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ah-eyecare
+    runtime: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+    plan: free
+    region: oregon
