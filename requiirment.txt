@@ -1,0 +1,9 @@
+gunicorn
+Flask
+Flask-WTF
+Werkzeug
+WTForms
+Jinja2
+requests
+removebg
+python-dotenv       # (only if you use .env files)
