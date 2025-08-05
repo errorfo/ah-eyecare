@@ -25,7 +25,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     if not Admin.query.first():
-        admin = Admin(username='admin', password=generate_password_hash('admin123'))
+        admin = Admin(username='AHeyecare', password=generate_password_hash('AHeyecare786@'))
         db.session.add(admin)
         db.session.commit()
 
@@ -230,6 +230,16 @@ class ProductForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Delete')
+@app.route('/delete_db_temp')
+def delete_db_temp():
+    import os
+    try:
+        os.remove('site.db')
+        return "✅ site.db deleted successfully."
+    except FileNotFoundError:
+        return "⚠️ site.db not found."
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True)
