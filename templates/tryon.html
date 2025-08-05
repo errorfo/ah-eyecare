@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Virtual Try-On - AHEYECARE</title>
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .frame-thumb.selected {
+      outline: 2px solid blue;
+    }
+    #canvasContainer {
+      position: relative;
+      width: 640px;
+      height: 480px;
+    }
+    canvas, video {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 relative">
+    <div class="absolute inset-0 pointer-events-none z-0" style="background: url('https://www.transparenttextures.com/patterns/food.png') repeat; opacity: 0.07;"></div>
+
+  <h2 style="margin: 20px 0;">Try Eyewear Live</h2>
+
+  <div id="canvasContainer">
+    <video id="video" width="640" height="480" autoplay muted playsinline></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </div>
+
+  <div id="frameList" style="margin-top:20px; display:flex; gap:10px; overflow-x:auto;">
+    {% for frame in frames %}
+      <img src="{{ frame.image_url }}" data-src="{{ frame.image_url }}" width="60" class="frame-thumb" />
+    {% endfor %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let glassesImg = new Image();
+    const frameThumbs = document.querySelectorAll('.frame-thumb');
+    if (frameThumbs[0]) {
+      glassesImg.src = frameThumbs[0].dataset.src;
+      frameThumbs[0].classList.add("selected");
+    }
+
+    frameThumbs.forEach(thumb => {
+      thumb.addEventListener('click', function () {
+        frameThumbs.forEach(t => t.classList.remove('selected'));
+        this.classList.add('selected');
+        glassesImg = new Image();
+        glassesImg.src = this.dataset.src;
+      });
+    });
+
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    faceMesh.onResults((results) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) return;
+
+      const landmarks = results.multiFaceLandmarks[0];
+      const left = landmarks[127];
+      const right = landmarks[356];
+      const nose = landmarks[168];
+
+      const dx = right.x - left.x;
+      const dy = right.y - left.y;
+      const angle = Math.atan2(dy, dx);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      const faceWidthPx = dist * canvas.width;
+
+      const frameWidth = faceWidthPx * 1.1;
+      const frameHeight = frameWidth * 0.35;
+
+      const centerX = (left.x + right.x) / 2 * canvas.width;
+      const centerY = nose.y * canvas.height;
+
+      if (glassesImg.complete && glassesImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle);
+        ctx.drawImage(glassesImg, -frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight);
+        ctx.restore();
+      }
+    });
+
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await faceMesh.send({ image: video });
+      },
+      width: 640,
+      height: 480
+    });
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+          camera.start();
+        };
+      })
+      .catch(err => {
+        alert('Webcam permission required.');
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
