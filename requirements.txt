@@ -1,9 +1,10 @@
-gunicorn
 Flask
 Flask-WTF
+Flask-SQLAlchemy
 Werkzeug
 WTForms
 Jinja2
 requests
 removebg
-python-dotenv       # (only if you use .env files)
+gunicorn
+
