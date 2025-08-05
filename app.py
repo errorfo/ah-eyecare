@@ -230,16 +230,5 @@ class ProductForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Delete')
-@app.route('/delete_db_temp')
-def delete_db_temp():
-    import os
-    try:
-        os.remove('site.db')
-        return "✅ site.db deleted successfully."
-    except FileNotFoundError:
-        return "⚠️ site.db not found."
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
-
 if __name__ == '__main__':
     app.run(debug=True)
