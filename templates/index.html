@@ -1,0 +1,871 @@
+    {% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div id="order-toast" class="fixed top-4 right-4 z-50">
+    {% for category, message in messages %}
+    <div class="bg-green-600 text-white px-6 py-3 rounded shadow mb-2 animate-fade-in">{{ message }}</div>
+    {% endfor %}
+</div>
+<script>
+    setTimeout(function () {
+        var toast = document.getElementById('order-toast');
+        if (toast) toast.style.display = 'none';
+    }, 3500);
+</script>
+{% endif %}
+{% endwith %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>A. H EYECARE | Premium Eyewear</title>
+    <meta name="description"
+        content="Discover premium eyeglasses and sunglasses at A. H EYECARE. Virtual Try-On, stylish frames, and fast checkout.">
+    <meta name="keywords" content="eyewear, sunglasses, eyeglasses, try on glasses, A. H EYECARE, buy glasses online">
+    <meta name="author" content="A. H EYECARE">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph (Facebook) -->
+    <meta property="og:title" content="A. H EYECARE | Premium Eyewear">
+    <meta property="og:description"
+        content="Try on stylish glasses online with virtual try-on. Shop eyeglasses and sunglasses at A. H EYECARE.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://127.0.0.1:5000/">
+    <meta property="og:image" content="/static/favicon.ico">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="A. H EYECARE - Virtual Try-On & Eyewear">
+    <meta name="twitter:description"
+        content="Experience eyewear shopping with virtual try-on. Discover the best eyeglasses online.">
+    <meta name="twitter:image" content="/static/favicon.ico">
+
+    <!-- Dublin Core (Optional) -->
+    <meta name="DC.date" content="{{ now.strftime('%Y-%m-%d') }}">
+    <meta name="DC.rights" content="© {{ now.year }} A. H EYECARE. All rights reserved.">
+
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "AHEYECARE",
+      "url": "https://aheyecare.com/",
+      "description": "Shop eyeglasses and sunglasses, try frames virtually, and enjoy fast delivery with COD available.",
+      "image": "https://aheyecare.com/static/logo.png"
+    }
+    </script>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.9) 0%, rgba(59, 130, 246, 0.8) 100%);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width .3s;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .cart-count {
+            top: -5px;
+            right: -5px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 relative">
+    <div class="absolute inset-0 pointer-events-none z-0"
+        style="background: url('https://www.transparenttextures.com/patterns/cubes.png') repeat; opacity: 0.08;"></div>
+    <!-- Top Banner -->
+    <div class="bg-blue-900 text-white text-center py-2 text-sm">
+        Free shipping on all orders| Eye care professionals on call
+    </div>
+
+    <!-- Navigation -->
+    <header class="sticky top-0 bg-white shadow-md z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-8">
+                <a href="/" class="flex items-center space-x-2">
+                    <img src="/static/logo.png" alt="A. H EYECARE Logo" class="h-10 w-auto">
+                    <span class="text-2xl font-bold text-blue-800">A. H EYECARE</span>
+                </a>
+
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#glasses" class="nav-link text-gray-700 hover:text-blue-700">Glasses</a>
+                    <a href="#sunglasses" class="nav-link text-gray-700 hover:text-blue-700">Sunglasses</a>
+                    <a href="/contact" class="nav-link text-gray-700 hover:text-blue-700">Contact</a>
+                    <a href="#eye-care" class="nav-link text-gray-700 hover:text-blue-700">Eye Care</a>
+                    <a href="#about-section" class="nav-link text-gray-700 hover:text-blue-700" id="about-link">About
+                        Us</a>
+                </nav>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="p-2 text-gray-600 hover:text-blue-700" id="search-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative">
+                    <a href="/cart" class="p-2 text-gray-600 hover:text-blue-700 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span class="ml-1 text-sm font-semibold">Cart</span>
+                    </a>
+                </div>
+                {% if session.get('admin') %}
+                <a href="/dashboard" class="text-blue-700 font-semibold hover:underline">Dashboard</a>
+                <a href="/logout" class="text-blue-700 font-semibold hover:underline">Logout</a>
+                {% else %}
+                <a href="/login" class="text-blue-700 font-semibold hover:underline">Admin Login</a>
+                {% endif %}
+                <button class="md:hidden p-2 text-gray-600 hover:text-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">See Clearly, Look Fabulous</h1>
+                <p class="text-xl mb-6">Premium eyewear with precision lenses for perfect vision and style</p>
+                <div class="flex space-x-4">
+                    <a href="#glasses"
+                        class="bg-white text-blue-800 px-6 py-3 rounded-full font-medium hover:bg-gray-100 transition">Shop
+                        Glasses</a>
+                    <a href="#sunglasses"
+                        class="border border-white px-6 py-3 rounded-full font-medium hover:bg-white hover:text-blue-800 transition">Shop
+                        Sunglasses</a>
+                    <a href="/tryon"
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-3 rounded-full shadow-lg transition transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 text-xl animate-fade-in"
+                        aria-label="Try frames virtually">Virtual Try‑On</a>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/2f9c6a17-340d-4ad1-bd1e-30f1b995f293.png"
+                    alt="Stylish models wearing premium eyewear in a modern studio setting with clean aesthetic"
+                    class="rounded-lg shadow-xl max-w-full h-auto">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center p-6 rounded-lg">
+                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Precision Lenses</h3>
+                    <p class="text-gray-600">Digitally surfaced with advanced coatings for crystal clear vision</p>
+                </div>
+
+                <div class="text-center p-6 rounded-lg">
+                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">COD Available</h3>
+                    <p class="text-gray-600">Cash on delivery available for customer trust</p>
+                </div>
+
+                <div class="text-center p-6 rounded-lg">
+                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">fast Service</h3>
+                    <p class="text-gray-600">product will be delivered at selected locations</p>
+                </div>
+
+                <div class="text-center p-6 rounded-lg">
+                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Home Try On</h3>
+                    <p class="text-gray-600">try frames frames at home for free before you buy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Products Section (Middle) -->
+    <section id="latest-products" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Latest Products</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Check out our newest arrivals</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for product in latest_products %}
+                <a href="/product/{{ product.id }}"
+                    class="block product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 hover:ring-2 ring-blue-500">
+                    <div class="relative">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-64 object-contain"
+                            loading="lazy" role="img">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1">{{ product.name }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ product.description }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900">₹{{ product.price }}</span>
+                            <button type="button"
+                                class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700 add-to-cart-btn transition transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                                data-product-id="{{ product.id }}">Add to Cart</button>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Virtual Try On -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Try Before You Buy</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">See how you look in our frames with our virtual
+                    try-on technology</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cbefdb88-1c8f-42d1-8dac-e149503e999a.png"
+                        alt="Smartphone screen showing virtual try-on feature with face detection and multiple frame options"
+                        class="rounded-lg shadow-md max-w-full h-auto">
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Virtual Try-On Technology</h3>
+                    <p class="text-gray-600 mb-6">Our advanced AR technology lets you see exactly how any frame will
+                        look on your face. No more guessing if a style will suit you - see it instantly in real-time
+                        with your phone's camera.</p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 p-2 rounded-full mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Real-time 3D Preview</h4>
+                                <p class="text-gray-600">See frames from all angles with realistic shadows and lighting
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 p-2 rounded-full mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Face Measurements</h4>
+                                <p class="text-gray-600">Automatically calculates frame dimensions relative to your face
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 p-2 rounded-full mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Share With Friends</h4>
+                                <p class="text-gray-600">Get opinions by sharing your virtual try-on looks</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/tryon"
+                        class="mt-8 bg-blue-700 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-800 transition inline-block transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                        aria-label="Try frames virtually">Try Now on Mobile</a>
+                    <!-- Accessibility & Animation Styles -->
+                    <style>
+                        .animate-fade-in {
+                            animation: fadeIn 0.7s ease;
+                        }
+
+                        @keyframes fadeIn {
+                            from {
+                                opacity: 0;
+                                transform: translateY(20px);
+                            }
+
+                            to {
+                                opacity: 1;
+                                transform: none;
+                            }
+                        }
+                    </style>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prescription Section -->
+    <section class="py-16 bg-blue-700 text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-6">Upload Your Prescription</h2>
+                <p class="text-xl mb-8">Get your precise prescription lenses delivered to your doorstep. Our
+                    optometrists verify every prescription for accuracy.</p>
+
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg w-full md:w-1/3">
+                        <div class="text-4xl font-bold mb-2">1</div>
+                        <h3 class="text-xl font-semibold mb-2">Upload or Enter</h3>
+                        <p>Submit your doctor's prescription or manually enter details</p>
+                    </div>
+
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg w-full md:w-1/3">
+                        <div class="text-4xl font-bold mb-2">2</div>
+                        <h3 class="text-xl font-semibold mb-2">Verification</h3>
+                        <p>Our optometrists review your prescription for accuracy</p>
+                    </div>
+
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg w-full md:w-1/3">
+                        <div class="text-4xl font-bold mb-2">3</div>
+                        <h3 class="text-xl font-semibold mb-2">Precision Lenses</h3>
+                        <p>Get perfectly crafted lenses made to your exact prescription</p>
+                    </div>
+                </div>
+
+                <a href="/contact"
+                    class="mt-10 bg-white text-blue-700 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition inline-block">Start
+                    Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Glasses Products Section -->
+    <section id="glasses" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+                <h2 class="text-3xl font-bold">Eyeglasses Collection</h2>
+                <div class="mt-4 md:mt-0">
+                    <button class="border border-gray-300 px-4 py-2 rounded-full mr-2 hover:bg-gray-100">For
+                        Men</button>
+                    <button class="border border-gray-300 px-4 py-2 rounded-full mr-2 hover:bg-gray-100">For
+                        Women</button>
+                    <button class="border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100">For Kids</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for product in products if product.product_type == 'eyeglasses' %}
+                <a href="/product/{{ product.id }}"
+                    class="product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 animate-fade-in block hover:ring-2 ring-blue-500">
+                    <div class="relative">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-64 object-contain"
+                            loading="lazy">
+                        <div class="absolute top-3 right-3">
+                            <button class="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                                onclick="event.preventDefault();">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1">{{ product.name }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ product.description }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900">₹{{ '%.0f'|format(product.price) }}</span>
+                            <button type="button"
+                                class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700 add-to-cart-btn"
+                                data-product-id="{{ product.id }}" onclick="event.stopPropagation();">Add to
+                                Cart</button>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="#glasses"
+                    class="inline-block border border-blue-600 text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition">View
+                    All Eyeglasses</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sunglasses Products Section -->
+    <section id="sunglasses" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+                <h2 class="text-3xl font-bold">Sunglasses Collection</h2>
+                <div class="mt-4 md:mt-0">
+                    <button
+                        class="border border-gray-300 px-4 py-2 rounded-full mr-2 hover:bg-gray-100">Polarized</button>
+                    <button class="border border-gray-300 px-4 py-2 rounded-full mr-2 hover:bg-gray-100">UV
+                        Protection</button>
+                    <button class="border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-100">Bluelight</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for product in products if product.product_type == 'sunglasses' %}
+                <a href="/product/{{ product.id }}"
+                    class="product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 animate-fade-in block hover:ring-2 ring-blue-500">
+                    <div class="relative">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-64 object-contain"
+                            loading="lazy">
+                        <div class="absolute top-3 right-3">
+                            <button class="bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                                onclick="event.preventDefault();">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1">{{ product.name }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ product.description }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900">₹{{ '%.0f'|format(product.price) }}</span>
+                            <button type="button"
+                                class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700 add-to-cart-btn"
+                                data-product-id="{{ product.id }}" onclick="event.stopPropagation();">Add to
+                                Cart</button>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="#sunglasses"
+                    class="inline-block border border-blue-600 text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition">View
+                    All Sunglasses</a>
+            </div>
+        </div>
+    </section>
+    <div id="cart-toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-50 hidden">
+        Added to cart!</div>
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-8 w-full max-w-md shadow-lg relative">
+            <button id="close-search" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Search Products</h2>
+            <input type="text" id="search-input" class="w-full border border-gray-300 rounded px-4 py-2 mb-4"
+                placeholder="Type to search...">
+            <div id="search-results" class="space-y-2"></div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                fetch(`/add_to_cart/${productId}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            const toast = document.getElementById('cart-toast');
+                            toast.textContent = 'Product added to cart!';
+                            toast.classList.remove('hidden');
+                            setTimeout(() => toast.classList.add('hidden'), 2000);
+                            // Update cart count if present
+                            if (data.cart_count !== undefined) {
+                                let cartCount = document.getElementById('cart-count');
+                                if (cartCount) cartCount.textContent = data.cart_count;
+                            }
+                        } else {
+                            alert('Could not add to cart.');
+                        }
+                    })
+                    .catch(() => alert('Could not add to cart.'));
+            });
+        });
+
+        // Search Modal Logic
+        const searchBtn = document.getElementById('search-btn');
+        const searchModal = document.getElementById('search-modal');
+        const closeSearch = document.getElementById('close-search');
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchBtn.addEventListener('click', () => {
+            searchModal.classList.remove('hidden');
+            searchInput.value = '';
+            searchResults.innerHTML = '';
+            searchInput.focus();
+        });
+        closeSearch.addEventListener('click', () => {
+            searchModal.classList.add('hidden');
+        });
+        searchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+            if (query.length < 2) {
+                searchResults.innerHTML = '';
+                return;
+            }
+            fetch(`/search_products?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.products && data.products.length) {
+                        searchResults.innerHTML = data.products.map(p => `<div class='p-2 border-b'><a href='#' class='text-blue-700 font-semibold'>${p.name}</a> <span class='text-gray-500'>₹${p.price}</span></div>`).join('');
+                    } else {
+                        searchResults.innerHTML = '<div class="text-gray-500">No products found.</div>';
+                    }
+                });
+        });
+
+        // About Us scroll fix
+        document.getElementById('about-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('about-section').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+
+    <!-- About Us Section (Moved to Bottom) -->
+    <section id="about-section" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">About Us</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">A. H EYECARE is dedicated to providing premium
+                    eyewear and expert vision care. Our mission is to help you see clearly and look fabulous with the
+                    latest styles and advanced lens technology. We combine professional eye care with a curated
+                    selection of frames for every face and style.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gray-50 rounded-lg p-8 shadow-sm">
+                    <h3 class="font-bold text-xl mb-2">Our Story</h3>
+                    <p class="text-gray-600">Founded by experienced optometrists, A. H EYECARE brings together medical
+                        expertise and fashion-forward design. We believe everyone deserves great vision and great style.
+                    </p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-8 shadow-sm">
+                    <h3 class="font-bold text-xl mb-2">Why Choose Us?</h3>
+                    <ul class="list-disc list-inside text-gray-600">
+                        <li>Certified eye care professionals</li>
+                        <li>Latest frame collections</li>
+                        <li>Precision prescription lenses</li>
+                        <li>Virtual try-on technology</li>
+                        <li>Fast delivery & easy returns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Eye Care Information -->
+    <section id="eye-care" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Eye Care Resources</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Expert advice for maintaining healthy vision</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e61135be-c961-4a71-81c8-afae34fc4519.png"
+                        alt="Optometrist examining a patient's eyes with modern diagnostic equipment in a well-lit clinic"
+                        class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Comprehensive Eye Exams</h3>
+                        <p class="text-gray-600 mb-4">Learn why annual eye exams are crucial for detecting vision
+                            problems and overall health conditions early.</p>
+                        <a href="/contact" class="text-blue-600 font-medium hover:text-blue-800">Read More →</a>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/df2e60b2-e132-4b0c-8428-133adaca7e05.png"
+                        alt="Side-by-side comparison of digital screens with and without blue light filter protection"
+                        class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Digital Eye Strain Solutions</h3>
+                        <p class="text-gray-600 mb-4">Protect your eyes from screen time with our expert tips and
+                            specially designed lenses.</p>
+                        <a href="#" class="text-blue-600 font-medium hover:text-blue-800">Read More →</a>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/80706074-348d-4d4c-824f-69284d60f225.png"
+                        alt="Collection of premium contact lens solution bottles and lens cases arrayed on modern bathroom counter"
+                        class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Contact Lens Care Guide</h3>
+                        <p class="text-gray-600 mb-4">Proper hygiene and maintenance for safe, comfortable contact lens
+                            wear.</p>
+                        <a href="#" class="text-blue-600 font-medium hover:text-blue-800">Read More →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <!-- Latest Products Section -->
+    <section id="latest-products" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Latest Products</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Check out our newest arrivals</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for product in latest_products %}
+                <div class="product-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300">
+                    <div class="relative">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-64 object-contain">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1">{{ product.name }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ product.description }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900">₹{{ product.price }}</span>
+                            <button type="button"
+                                class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700 add-to-cart-btn"
+                                data-product-id="{{ product.id }}">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Testimonials -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">What Our Customers Say</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Join 500,000+ happy customers with perfect vision</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0 mr-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/41ac9f47-ae88-4186-86bc-e0a91cf45b95.png"
+                                alt="Portrait of smiling middle-aged woman with short brown hair wearing red dress"
+                                class="h-12 w-12 rounded-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Priya Sharma</h4>
+                            <div class="flex text-yellow-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"The virtual try-on was so accurate! My new glasses fit perfectly and the
+                        prescription is spot on. Delivery was faster than expected too."</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0 mr-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/47ea84cd-f81f-4f85-a697-7de1cefea98e.png"
+                                alt="Portrait of young man with glasses and beard smiling against blue background"
+                                class="h-12 w-12 rounded-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Rahul Mehta</h4>
+                            <div class="flex text-yellow-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.41 1.24.562c.969 0 1.3788 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"The blue light blocking glasses have made such a difference to my work
+                        days. No more eye strain even after 10+ hours on the computer."</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0 mr-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d8a3b944-ba39-402e-bd46-2ceab414c106.png"
+                                alt="Portrait of elderly woman with silver hair smiling while wearing stylish glasses"
+                                class="h-12 w-12 rounded-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Sarita Patel</h4>
+                            <div class="flex text-yellow-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1"/>
+                                    </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"I'm so impressed with the quality and range of frames. The customer service was also exceptional when I had a question about my order."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class=" bg-blue-900 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Services</h3>
+                <ul class="space-y-1 text-gray-300">
+                    <li><a href="https://www.google.com/maps?q=AH+EYECARE" target="_blank" class="hover:underline">Store Locator</a></li>
+                    <li><a href="/buying-guide" class="hover:underline">Buying Guide</a></li>
+                    <li><a href="/suggestions" class="hover:underline">Suggest a Feature</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold mb-2">About Us</h3>
+                <ul class="space-y-1 text-gray-300">
+                    <li><a href="/hiring" class="hover:underline">We Are Hiring</a></li>
+                    <li><a href="/refer" class="hover:underline">Refer & Earn</a></li>
+                    <li>
+      <a href="https://www.facebook.com/yourprofile" target="_blank" class="flex items-center space-x-2 text-blue-400 hover:underline">
+        <img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" class="h-5 w-5" alt="Facebook Logo" />
+        <span>Connect Me on Facebook</span>
+      </a>
+    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Help</h3>
+                <ul class="space-y-1 text-gray-300">
+                    <li><a href="/faqs" class="hover:underline">FAQ's</a></li>
+                    <li><span class="text-gray-300">If you need any help, email us: <a href="mailto:ghfyujkg@gmail.com" class="hover:underline">ghfyujkg@gmail.com</a></span>
+                </ul>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-lg font-semibold mb-2">Download App</h3>
+                <div class="flex space-x-2">
+                    <a href="#"><img src="https://img.icons8.com/color/48/google-play.png" alt="Google Play" class="h-10"></a>
+                    <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/mac-os.png" alt="App Store" class="h-10"></a>
+                </div>
+                <p class="text-gray-300 mt-2">Download our app to try frames virtually.</p>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 text-center py-6 text-sm text-gray-300">
+  <div class="mb-2">© {{ now.year }} A. H EYECARE. All rights reserved.</div>
+  <div class="space-x-4">
+    <a href="/terms" class="hover:underline">T & C</a>
+    <a href="/privacy" class="hover:underline">Privacy</a>
+    <a href="/disclaimer" class="hover:underline">Disclaimer</a>
+    <a href="/contact" class="hover:underline">Contact Us</a>
+  </div>
+</div>
+
+    </footer>

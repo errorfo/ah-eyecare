@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AHEYECARE</title>
+  <meta name="description" content="Admin dashboard for A. H EYECARE to manage products, messages, and orders.">
+  <meta name="robots" content="noindex, nofollow"> <!-- Crucial: Prevents search engines from indexing admin pages -->
+  <meta name="author" content="A. H EYECARE">
+  <meta name="theme-color" content="#1e40af">
+
+  <!-- Open Graph / Facebook (Optional, but good for internal tools if shared) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Admin Dashboard - AHEYECARE">
+  <meta property="og:description" content="Admin dashboard for A. H EYECARE.">
+  <meta property="og:url" content="https://aheyecare.com/dashboard">
+  <meta property="og:image" content="https://aheyecare.com/static/logo.png"> <!-- Replace with a suitable image -->
+
+  <!-- Twitter Card (Optional) -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Admin Dashboard - AHEYECARE">
+  <meta name="twitter:description" content="Admin dashboard for A. H EYECARE.">
+  <meta name="twitter:image" content="https://aheyecare.com/static/logo.png"> <!-- Replace with a suitable image -->
+
+  <!-- Favicon and Touch Icons -->
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative">
+    <div class="absolute inset-0 pointer-events-none z-0" style="background: url('https://www.transparenttextures.com/patterns/hexellence.png') repeat; opacity: 0.07;"></div>
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md px-6 py-8 hidden md:block">
+    <h2 class="text-2xl font-bold text-blue-700 mb-6">AHEYECARE Admin</h2>
+    <nav class="flex flex-col space-y-4">
+      <a href="#overview" class="text-gray-700 hover:text-blue-700" aria-label="Go to Dashboard Overview">Dashboard</a>
+      <a href="#messages" class="text-gray-700 hover:text-blue-700" aria-label="View Contact Messages">Contact Messages</a>
+      <a href="#products" class="text-gray-700 hover:text-blue-700" aria-label="Manage Products">Products</a>
+      <a href="#orders" class="text-gray-700 hover:text-blue-700" aria-label="View Orders">Orders</a>
+      <a href="/logout" class="text-red-600 font-semibold hover:underline mt-10" aria-label="Logout from Admin Panel">Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 px-4 md:px-10 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-blue-800">Dashboard</h1>
+      <span class="text-sm text-gray-600">Session timeout: 30 mins</span>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="mb-4">
+      {% for category, message in messages %}
+      <div class="px-4 py-3 rounded bg-{{ 'green' if category == 'success' else 'red' }}-100 text-{{ 'green' if category == 'success' else 'red' }}-800" role="alert">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Quick Stats -->
+    <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Products</h3>
+        <p class="text-2xl font-bold text-blue-700 mt-2">{{ products|length }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Messages</h3>
+        <p class="text-2xl font-bold text-blue-700 mt-2">{{ messages|length }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Orders</h3>
+        <p class="text-2xl font-bold text-blue-700 mt-2">{{ orders|length }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Total Sales</h3>
+        <p class="text-2xl font-bold text-green-600 mt-2">₹{{ '%.2f'|format(orders|sum(attribute='total')) }}</p>
+      </div>
+    </section>
+
+    <!-- Product Form -->
+    <section class="mb-10">
+        <h2 class="text-xl font-bold text-blue-700 mb-4">Add New Product</h2>
+        <form method="POST" action="{{ url_for('add_product') }}" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {{ form.csrf_token }} <!-- CSRF token for security -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                {{ form.name(class="mt-1 px-3 py-2 border rounded w-full", placeholder="Product Name", id="name") }}
+            </div>
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                {{ form.description(class="mt-1 px-3 py-2 border rounded w-full", placeholder="Description", id="description") }}
+            </div>
+            <div>
+                <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                {{ form.price(class="mt-1 px-3 py-2 border rounded w-full", placeholder="Price", id="price") }}
+            </div>
+            <div>
+                <label for="image" class="block text-sm font-medium text-gray-700">Product Image</label>
+                {{ form.image(class="mt-1 px-3 py-2 border rounded w-full", id="image") }}
+            </div>
+            <div>
+                <label for="product_type" class="block text-sm font-medium text-gray-700">Product Type</label>
+                {{ form.product_type(class="mt-1 px-3 py-2 border rounded w-full", id="product_type") }}
+            </div>
+            <div class="col-span-full">
+                {{ form.submit(class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 w-full", aria-label="Add Product") }}
+            </div>
+        </form>
+    </section>
+
+    <!-- Products List -->
+    <section id="products" class="mb-10">
+      <h2 class="text-xl font-bold text-blue-700 mb-4">All Products</h2>
+      <div class="overflow-x-auto bg-white shadow rounded">
+        <table class="w-full table-auto">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 text-left">Name</th>
+              <th class="px-4 py-2 text-left">Type</th>
+              <th class="px-4 py-2 text-right">Price</th>
+              <th class="px-4 py-2 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+            <tr class="border-t">
+              <td class="px-4 py-2">{{ product.name }}</td>
+              <td class="px-4 py-2 capitalize">{{ product.product_type }}</td>
+              <td class="px-4 py-2 text-right">₹{{ '%.2f'|format(product.price) }}</td>
+              <td class="px-4 py-2 text-center">
+                <form method="POST" action="{{ url_for('delete_product_route', product_id=product.id) }}" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                    {{ delete_form.csrf_token }} <!-- CSRF token for security -->
+                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" aria-label="Delete product {{ product.name }}">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Messages List -->
+    <section id="messages" class="mb-10">
+      <h2 class="text-xl font-bold text-blue-700 mb-4">Contact Messages</h2>
+      <div class="overflow-x-auto bg-white shadow rounded">
+        <table class="min-w-full table-auto">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 text-left">Name</th>
+              <th class="px-4 py-2 text-left">Email</th>
+              <th class="px-4 py-2 text-left">Message</th>
+              <th class="px-4 py-2 text-left">Received</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for msg in messages %}
+            <tr class="border-t">
+              <td class="px-4 py-2">{{ msg.name }}</td>
+              <td class="px-4 py-2">{{ msg.email }}</td>
+              <td class="px-4 py-2">{{ msg.message }}</td>
+              <td class="px-4 py-2">{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Orders List -->
+    <section id="orders">
+      <h2 class="text-xl font-bold text-blue-700 mb-4">Recent Orders</h2>
+      <div class="overflow-x-auto bg-white shadow rounded">
+        <table class="min-w-full table-auto">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 text-left">Order ID</th>
+              <th class="px-4 py-2 text-left">Customer Name</th>
+              <th class="px-4 py-2 text-left">Email</th>
+              <th class="px-4 py-2 text-left">Phone</th>
+              <th class="px-4 py-2 text-left">Address</th>
+              <th class="px-4 py-2 text-left">Items</th>
+              <th class="px-4 py-2 text-right">Total</th>
+              <th class="px-4 py-2 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr class="border-t">
+              <td class="px-4 py-2">{{ order.id }}</td>
+              <td class="px-4 py-2">{{ order.name }}</td>
+              <td class="px-4 py-2">{{ order.email }}</td>
+              <td class="px-4 py-2">{{ order.phone }}</td>
+              <td class="px-4 py-2">{{ order.address }}</td>
+              <td class="px-4 py-2">
+                <ul>
+                  {% for item in order.items | from_json %} {# Assuming 'items' is a JSON string #}
+                    <li>{{ item.name }} x {{ item.qty }}</li>
+                  {% endfor %}
+                </ul>
+              </td>
+              <td class="px-4 py-2 text-right">₹{{ '%.2f'|format(order.total) }}</td>
+              <td class="px-4 py-2">{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
