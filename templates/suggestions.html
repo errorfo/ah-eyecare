@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suggestions - A. H Eyecare</title>
+    <meta name="description" content="Submit your suggestions and help us improve your eyewear experience.">
+    <meta name="keywords" content="eyewear feedback, customer suggestions, user experience improvement">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800">
+    <div class="max-w-xl mx-auto px-6 py-12">
+        <h1 class="text-3xl font-bold text-center text-blue-900 mb-6">We Value Your Suggestions</h1>
+        <p class="text-center text-gray-600 mb-6">Your feedback helps us improve your experience at A. H EYECARE. Let us know how we can serve you better.</p>
+
+        <form action="/contact" method="POST" class="space-y-6">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Your Name</label>
+                <input type="text" name="name" id="name" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Your Email</label>
+                <input type="email" name="email" id="email" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="message" class="block text-sm font-medium text-gray-700">Your Suggestion</label>
+                <textarea name="message" id="message" rows="5" required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+            <div class="text-center">
+                <button type="submit"
+                        class="bg-blue-900 text-white px-6 py-2 rounded hover:bg-blue-800 transition">
+                    Submit Suggestion
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-8">
+            <a href="/" class="text-blue-700 hover:underline">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
