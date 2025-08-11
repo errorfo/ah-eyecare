@@ -208,12 +208,13 @@
               <td class="px-4 py-2">{{ order.phone }}</td>
               <td class="px-4 py-2">{{ order.address }}</td>
               <td class="px-4 py-2">
-                <ul>
-                  {% for item in order.items %}
-                    <li>{{ item.name }} x {{ item.qty }}</li>
-                  {% endfor %}
-                </ul>
-              </td>
+    <ul>
+        {% for item in order.order_items %}
+            <li>{{ item.name }} x {{ item.qty }} - ₹{{ "%.2f"|format(item.price) }}</li>
+        {% endfor %}
+    </ul>
+</td>
+
               <td class="px-4 py-2 text-right">₹{{ '%.2f'|format(order.total) }}</td>
               <td class="px-4 py-2">{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
             </tr>
@@ -225,3 +226,4 @@
   </main>
 </body>
 </html>
+
