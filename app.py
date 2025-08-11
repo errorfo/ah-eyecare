@@ -169,32 +169,36 @@ def product_detail(product_id):
     similar_products = Product.query.filter(Product.product_type == product.product_type, Product.id != product.id).order_by(Product.id.desc()).limit(4).all()
     return render_template('product_detail.html', product=product, similar_products=similar_products)
 
-@app.route('/checkout', methods=['GET', 'POST'])
-def checkout():
-    cart = get_cart()
-    products = []
-    total = 0
+if request.method == 'POST':
+    name = request.form.get('name')
+    email = request.form.get('email')
+    phone = request.form.get('phone')
+    address = request.form.get('address')
+    order_type = request.form.get('order_type')
+    lens_power = request.form.get('lens_power', '')
 
-    for pid, qty in cart.items():
-        product = Product.query.get(int(pid))
-        if product:
-            products.append({'id': product.id, 'name': product.name, 'price': product.price, 'qty': qty})
-            total += product.price * qty
+    lens_price = 0
+    if order_type == "with_lenses":
+        lens_price = 1000
+        total += lens_price
 
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        address = request.form.get('address')
+    items = products.copy()
+    if lens_price > 0:
+        items.append({'name': f'Lenses ({lens_power})', 'price': lens_price, 'qty': 1})
 
-        items = json.dumps(products)
-        order = Order(name=name, email=email, phone=phone, address=address, items=items, total=total)
-        db.session.add(order)
-        db.session.commit()
-        session['cart'] = {}
-        return render_template('checkout.html', products=[], total=0, order_success=True)
+    order = Order(
+        name=name,
+        email=email,
+        phone=phone,
+        address=address,
+        items=json.dumps(items),
+        total=total
+    )
+    db.session.add(order)
+    db.session.commit()
+    session['cart'] = {}
+    return render_template('checkout.html', products=[], total=0, order_success=True)
 
-    return render_template('checkout.html', products=products, total=total)
 
 @app.route('/cart')
 def cart():
