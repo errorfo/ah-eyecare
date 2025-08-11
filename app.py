@@ -137,7 +137,31 @@ def tryon():
     products = Product.query.filter_by(vr_enabled=True).all()
     frames = [{'name': p.name, 'image_url': p.vr_image_url} for p in products]
     return render_template('tryon.html', frames=frames)
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        message = request.form.get('message', '').strip()
 
+        if not name or not email or not message:
+            flash('All fields are required.', 'danger')
+            return redirect(url_for('contact'))
+
+        # Save to DB
+        try:
+            new_message = ContactMessage(name=name, email=email, message=message)
+            db.session.add(new_message)
+            db.session.commit()
+            flash('Your message has been sent successfully!', 'success')
+            return redirect(url_for('contact'))
+        except Exception as e:
+            print(f"Error saving contact message: {e}")
+            flash('Something went wrong. Please try again later.', 'danger')
+            return redirect(url_for('contact'))
+
+    # GET request → render page
+    return render_template('contact.html')
 
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
@@ -217,7 +241,7 @@ def store_locator():
 
 @app.route('/buying-guide')
 def buying_guide():
-    return render_template("buying_guide.html")
+    return render_template("buying-guide.html")
 
 @app.route('/suggestions')
 def suggestions():
