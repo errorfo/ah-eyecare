@@ -92,6 +92,33 @@
         <div class="text-right text-xl font-bold mb-6">Total: ₹{{ total }}</div>
         <div class="text-center flex flex-col sm:flex-row gap-4 items-center justify-center">
             <a href="/" class="bg-blue-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-800 transition">Continue Shopping</a>
+            <!-- Lens Option in Cart -->
+<div class="mt-6">
+    <label class="block font-semibold">Add Lenses:</label>
+    <select id="lens_option_cart" class="border p-2 w-full">
+        <option value="frame_only">Frame Only</option>
+        <option value="with_lenses">Frame with Power Lenses (+₹1000)</option>
+    </select>
+</div>
+
+<p class="text-xl font-bold mt-4">Total: ₹<span id="cart_total">{{ "%.2f"|format(total) }}</span></p>
+
+<script>
+const lensOptionCart = document.getElementById('lens_option_cart');
+const cartTotal = document.getElementById('cart_total');
+
+const cartBaseTotal = parseFloat(cartTotal.innerText);
+const lensCost = 1000;
+
+lensOptionCart.addEventListener('change', () => {
+    if (lensOptionCart.value === 'with_lenses') {
+        cartTotal.innerText = (cartBaseTotal + lensCost).toFixed(2);
+    } else {
+        cartTotal.innerText = cartBaseTotal.toFixed(2);
+    }
+});
+</script>
+
             <a href="/checkout" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition">Buy Now</a>
         </div>
         {% else %}
@@ -103,3 +130,4 @@
     </div>
 </body>
 </html>
+
