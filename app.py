@@ -133,10 +133,10 @@ def add_product():
 
 @app.route('/tryon')
 def tryon():
-    # Get only VR-enabled products
     products = Product.query.filter_by(vr_enabled=True).all()
     frames = [{'name': p.name, 'image_url': p.vr_image_url} for p in products]
     return render_template('tryon.html', frames=frames)
+
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
@@ -148,7 +148,6 @@ def contact():
             flash('All fields are required.', 'danger')
             return redirect(url_for('contact'))
 
-        # Save to DB
         try:
             new_message = ContactMessage(name=name, email=email, message=message)
             db.session.add(new_message)
@@ -160,7 +159,6 @@ def contact():
             flash('Something went wrong. Please try again later.', 'danger')
             return redirect(url_for('contact'))
 
-    # GET request → render page
     return render_template('contact.html')
 
 @app.route('/product/<int:product_id>')
@@ -169,36 +167,49 @@ def product_detail(product_id):
     similar_products = Product.query.filter(Product.product_type == product.product_type, Product.id != product.id).order_by(Product.id.desc()).limit(4).all()
     return render_template('product_detail.html', product=product, similar_products=similar_products)
 
-if request.method == 'POST':
-    name = request.form.get('name')
-    email = request.form.get('email')
-    phone = request.form.get('phone')
-    address = request.form.get('address')
-    order_type = request.form.get('order_type')
-    lens_power = request.form.get('lens_power', '')
+@app.route('/checkout', methods=['GET', 'POST'])
+def checkout():
+    cart = get_cart()
+    products = []
+    total = 0
 
-    lens_price = 0
-    if order_type == "with_lenses":
-        lens_price = 1000
-        total += lens_price
+    for pid, qty in cart.items():
+        product = Product.query.get(int(pid))
+        if product:
+            products.append({'id': product.id, 'name': product.name, 'price': product.price, 'qty': qty})
+            total += product.price * qty
 
-    items = products.copy()
-    if lens_price > 0:
-        items.append({'name': f'Lenses ({lens_power})', 'price': lens_price, 'qty': 1})
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        order_type = request.form.get('order_type')  # "normal" or "with_lenses"
+        lens_power = request.form.get('lens_power', '')
 
-    order = Order(
-        name=name,
-        email=email,
-        phone=phone,
-        address=address,
-        items=json.dumps(items),
-        total=total
-    )
-    db.session.add(order)
-    db.session.commit()
-    session['cart'] = {}
-    return render_template('checkout.html', products=[], total=0, order_success=True)
+        lens_price = 0
+        if order_type == "with_lenses":
+            lens_price = 1000  # extra charge
+            total += lens_price
 
+        items = products.copy()
+        if lens_price > 0:
+            items.append({'name': f'Lenses ({lens_power})', 'price': lens_price, 'qty': 1})
+
+        order = Order(
+            name=name,
+            email=email,
+            phone=phone,
+            address=address,
+            items=json.dumps(items),
+            total=total
+        )
+        db.session.add(order)
+        db.session.commit()
+        session['cart'] = {}
+        return render_template('checkout.html', products=[], total=0, order_success=True)
+
+    return render_template('checkout.html', products=products, total=total)
 
 @app.route('/cart')
 def cart():
