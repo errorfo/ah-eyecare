@@ -1,1 +1,0 @@
-// JS for cart and webcam functionality
