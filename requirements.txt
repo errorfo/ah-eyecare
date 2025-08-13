@@ -12,7 +12,7 @@ greenlet==3.0.3
 
 # Image processing
 removebg==0.4
-Pillow==10.0.0
+Pillow==9.5.0
 
 # For database migrations (optional but good)
 Flask-Migrate==4.0.5
