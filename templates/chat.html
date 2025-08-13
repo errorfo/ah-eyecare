@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Chat - AH EYECARE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body class="bg-gray-100 flex flex-col h-screen">
+
+    <!-- Chat Header -->
+    <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+        <h1 class="text-lg font-bold">💬 Live Chat</h1>
+        <button id="clearChat" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Clear Chat</button>
+    </div>
+
+    <!-- Chat Box -->
+    <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-2 bg-white"></div>
+
+    <!-- Chat Input -->
+    <div class="p-3 bg-gray-200 flex items-center gap-2">
+        <input id="messageInput" type="text" placeholder="Type a message..." 
+               class="flex-1 border rounded px-3 py-2 focus:outline-none">
+        <button id="sendBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Send</button>
+
+        <!-- Prescription Upload -->
+        <label class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 cursor-pointer">
+            📄 Upload
+            <input type="file" id="prescriptionInput" class="hidden">
+        </label>
+    </div>
+
+<script>
+    const socket = io();
+    const username = "User"; // You can dynamically set this if needed
+
+    // Join chat
+    socket.emit('join', { username });
+
+    // Display messages
+    socket.on('chat_message', (data) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = "p-2 rounded bg-gray-100 border";
+        msgDiv.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+        document.getElementById('messages').appendChild(msgDiv);
+        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    });
+
+    // Send message
+    document.getElementById('sendBtn').addEventListener('click', () => {
+        const message = document.getElementById('messageInput').value.trim();
+        if (message) {
+            socket.emit('chat_message', { username, message });
+            document.getElementById('messageInput').value = '';
+        }
+    });
+
+    // Upload prescription
+    document.getElementById('prescriptionInput').addEventListener('change', () => {
+        const file = document.getElementById('prescriptionInput').files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/upload_prescription', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                console.log('Prescription uploaded:', res.filename);
+            }
+        });
+    });
+
+    // Clear chat
+    document.getElementById('clearChat').addEventListener('click', () => {
+        fetch('/clear_chat', { method: 'POST' })
+            .then(res => res.json())
+            .then(() => {
+                document.getElementById('messages').innerHTML = '';
+            });
+    });
+</script>
+
+</body>
+</html>

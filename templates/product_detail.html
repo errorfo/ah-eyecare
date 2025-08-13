@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Product Details | A. H EYECARE</title>
+    <meta name="description" content="{{ product.description or 'Discover high-quality eyewear at A. H EYECARE.' }}">
+    <meta name="keywords" content="{{ product.name | lower }}, {{ product.product_type | lower }}, eyewear, glasses, sunglasses, buy online, AHEYECARE">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://aheyecare.com/product/{{ product.id }}">
+    <meta name="author" content="A. H EYECARE">
+    <meta name="theme-color" content="#1e40af">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product">
+    <meta property="og:title" content="{{ product.name }} - A. H EYECARE">
+    <meta property="og:description" content="{{ product.description or 'Discover high-quality eyewear at A. H EYECARE.' }}">
+    <meta property="og:url" content="https://aheyecare.com/product/{{ product.id }}">
+    <meta property="og:image" content="{{ product.image_url }}">
+    <meta property="og:price:amount" content="{{ '%.2f'|format(product.price) }}">
+    <meta property="og:price:currency" content="INR">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ product.name }} - A. H EYECARE">
+    <meta name="twitter:description" content="{{ product.description or 'Discover high-quality eyewear at A. H EYECARE.' }}">
+    <meta name="twitter:image" content="{{ product.image_url }}">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+    <!-- Product Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "{{ product.name }}",
+      "image": "{{ product.image_url }}",
+      "description": "{{ product.description or 'High-quality eyewear from A. H EYECARE.' }}",
+      "sku": "AHEYECARE-{{ product.id }}",
+      "brand": {
+        "@type": "Brand",
+        "name": "A. H EYECARE"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://aheyecare.com/product/{{ product.id }}",
+        "priceCurrency": "INR",
+        "price": "{{ '%.2f'|format(product.price) }}",
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <!-- Left: Images -->
+                <div class="flex flex-col items-center">
+    <!-- Main Image -->
+    <img id="main-product-img" src="{{ product.image_url }}" alt="{{ product.name }}"
+         class="w-64 h-64 object-contain rounded-lg border mb-4">
+
+    <!-- Gallery Thumbnails -->
+    {% if product.image_urls %}
+    <div class="flex gap-2 mt-4">
+        {% for img_url in product.image_list %}
+}
+            <img src="{{ img_url }}" alt="{{ product.name }}"
+                 class="w-20 h-20 object-contain border rounded hover:scale-105 transition cursor-pointer"
+                 onclick="document.getElementById('main-product-img').src=this.src;">
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+                <!-- Right: Details -->
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">{{ product.name }}</h1>
+                    <p class="text-gray-600 mb-4">{{ product.description or 'No description available.' }}</p>
+                    <div class="text-2xl font-bold text-blue-700 mb-4">₹{{ product.price }}</div>
+
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <button type="button"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-full text-lg hover:bg-blue-700 add-to-cart-btn"
+                                data-product-id="{{ product.id }}">
+                            Add to Cart
+                        </button>
+                        <form method="POST" action="/add_to_cart/{{ product.id }}"
+                              onsubmit="event.preventDefault(); fetch(this.action, {method: 'POST'}).then(() => { window.location.href = '/checkout'; });">
+                            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full text-lg hover:bg-green-700">Buy Now</button>
+                        </form>
+                    </div>
+
+                    <!-- Reviews -->
+                    <div class="mt-6">
+                        <h2 class="text-xl font-bold mb-2">Customer Reviews</h2>
+                        {% if product.reviews and product.reviews|length > 0 %}
+                            <div class="space-y-4">
+                                {% for review in product.reviews %}
+                                    <div class="bg-gray-100 p-4 rounded shadow">
+                                        <strong>{{ review.name }}</strong>
+                                        <span class="text-yellow-500">{% for i in range(review.rating) %}★{% endfor %}</span>
+                                        <p class="mt-1 text-gray-700">{{ review.comment }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="bg-gray-100 rounded p-4 text-gray-700">No reviews yet. Be the first to review this product!</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar Products -->
+        {% if similar_products %}
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold mb-6 text-blue-700">Similar Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                {% for sp in similar_products %}
+                <a href="/product/{{ sp.id }}" class="bg-white rounded-lg shadow-md overflow-hidden hover:ring-2 ring-blue-500">
+                    <img src="{{ sp.image_url }}" alt="{{ sp.name }}" class="w-full h-40 object-contain">
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1">{{ sp.name }}</h3>
+                        <p class="text-gray-600 text-sm mb-2">{{ sp.description }}</p>
+                        <span class="font-bold text-blue-700">₹{{ '%.0f'|format(sp.price) }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Toast -->
+    <div id="cart-toast" class="fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-50 hidden">Added to cart!</div>
+
+    <script>
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            fetch(`/add_to_cart/${productId}`, {method: 'POST'})
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const toast = document.getElementById('cart-toast');
+                        toast.textContent = 'Product added to cart!';
+                        toast.classList.remove('hidden');
+                        setTimeout(() => toast.classList.add('hidden'), 2000);
+                    } else {
+                        alert('Could not add to cart.');
+                    }
+                })
+                .catch(() => alert('Could not add to cart.'));
+        });
+    });
+    </script>
+</body>
+</html>
