@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - AHEYECARE</title>
+  <meta name="description" content="Admin dashboard for A. H EYECARE to manage products, messages, and orders.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="A. H EYECARE">
+  <meta name="theme-color" content="#1e40af">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Admin Dashboard - AHEYECARE">
+  <meta property="og:description" content="Admin dashboard for A. H EYECARE.">
+  <meta property="og:url" content="https://aheyecare.com/dashboard">
+  <meta property="og:image" content="https://aheyecare.com/static/logo.png">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Admin Dashboard - AHEYECARE">
+  <meta name="twitter:description" content="Admin dashboard for A. H EYECARE.">
+  <meta name="twitter:image" content="https://aheyecare.com/static/logo.png">
+
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex relative">
+  <div class="absolute inset-0 pointer-events-none z-0" style="background: url('https://www.transparenttextures.com/patterns/hexellence.png') repeat; opacity: 0.07;"></div>
+
+  <aside class="w-64 bg-white shadow-md px-6 py-8 hidden md:block">
+    <h2 class="text-2xl font-bold text-blue-700 mb-6">AHEYECARE Admin</h2>
+    <nav class="flex flex-col space-y-4">
+      <a href="#overview" class="text-gray-700 hover:text-blue-700">Dashboard</a>
+      <a href="#messages" class="text-gray-700 hover:text-blue-700">Contact Messages</a>
+      <a href="#products" class="text-gray-700 hover:text-blue-700">Products</a>
+      <a href="#orders" class="text-gray-700 hover:text-blue-700">Orders</a>
+      <a href="/admin/chat" class="text-green-600 hover:text-green-700 font-semibold">Live Chat Support</a>
+      <a href="/logout" class="text-red-600 font-semibold hover:underline mt-10">Logout</a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 px-4 md:px-10 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-blue-800">Dashboard</h1>
+      <span class="text-sm text-gray-600">Session timeout: 30 mins</span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-4">
+          {% for category, message in messages %}
+          <div class="px-4 py-3 rounded bg-{{ 'green' if category == 'success' else 'red' }}-100 text-{{ 'green' if category == 'success' else 'red' }}-800">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Products</h3>
+        <p class="text-2xl font-bold text-blue-700 mt-2">{{ products|length }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Messages</h3>
+        <p class="text-2xl font-bold text-blue-700 mt-2">{{ messages|length }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Orders</h3>
+        <p class="text-2xl font-bold text-blue-700 mt-2">{{ orders|length }}</p>
+      </div>
+      <div class="bg-white shadow rounded-lg p-5 text-center">
+        <h3 class="text-lg font-semibold text-gray-600">Total Sales</h3>
+        <p class="text-2xl font-bold text-green-600 mt-2">₹{{ '%.2f'|format(orders|sum(attribute='total')) }}</p>
+      </div>
+    </section>
+
+    <section class="mb-10">
+  <h2 class="text-xl font-bold text-blue-700 mb-4">Add New Product</h2>
+  <form method="POST" action="{{ url_for('add_product') }}" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-4">
+      {{ form.name.label(class_="block text-sm font-medium text-gray-700") }}
+      {{ form.name(class_="mt-1 block w-full border border-gray-300 rounded-md p-2") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.description.label(class_="block text-sm font-medium text-gray-700") }}
+      {{ form.description(class_="mt-1 block w-full border border-gray-300 rounded-md p-2") }}
+    </div>
+
+    <div class="mb-4">
+      {{ form.price.label(class_="block text-sm font-medium text-gray-700") }}
+      {{ form.price(class_="mt-1 block w-full border border-gray-300 rounded-md p-2") }}
+    </div>
+    <div class="mb-4">
+      {{ form.image.label(class_="block text-sm font-medium text-gray-700") }}
+      {{ form.image(class_="mt-1 block w-full border border-gray-300 rounded-md p-2") }}
+    </div>
+    <!-- New Multiple Extra Images -->
+     <div>
+  <label class="block text-sm font-medium">Lens Extra Price (₹)</label>
+  <input type="number" step="0.01" name="lens_extra_price" value="0" class="border rounded p-2 w-full">
+</div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Extra Images:</label>
+      <input type="file" name="extra_images" accept="image/*" multiple class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+      <p class="text-xs text-gray-500">You can select multiple images at once.</p>
+    </div>
+
+    <!-- VR fields -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">
+        <input type="checkbox" name="vr_enabled" class="mr-2"> Enable Virtual Try-On
+      </label>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">VR Image (Transparent PNG):</label>
+      <input type="file" name="vr_image" accept="image/png" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+    </div>
+
+    <div class="mb-4">
+      {{ form.product_type.label(class_="block text-sm font-medium text-gray-700") }}
+      {{ form.product_type(class_="mt-1 block w-full border border-gray-300 rounded-md p-2") }}
+    </div>
+
+    <div class="mt-4">
+      {{ form.submit(class_="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 w-full") }}
+    </div>
+</form>
+    </section>
+
+
+    <section id="products" class="mb-10">
+      <h2 class="text-xl font-bold text-blue-700 mb-4">All Products</h2>
+      <div class="overflow-x-auto bg-white shadow rounded">
+        <table class="w-full table-auto">
+          <thead class="bg-blue-100">
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Price</th>
+    <th>Main Image</th>
+    <th>Extra Images</th>
+    <th>Video</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+<tbody>
+  {% for product in products %}
+  <tr class="border-t">
+    <td>{{ product.name }}</td>
+    <td class="capitalize">{{ product.product_type }}</td>
+    <td class="text-right">₹{{ '%.2f'|format(product.price) }}</td>
+    <td>
+      {% if product.image_url %}
+      <img src="{{ product.image_url }}" alt="Main Image" class="h-12 mx-auto">
+      {% else %}
+      N/A
+      {% endif %}
+    </td>
+   <td>
+  {% if product.image_list %}
+    {% for img_url in product.image_list %}
+      <img src="{{ img_url }}" alt="Extra Image" class="h-12 inline-block mr-1 mb-1 rounded">
+    {% endfor %}
+  {% else %}
+    N/A
+  {% endif %}
+</td>
+
+
+    <td>
+      {% if product.video_url %}
+        <video width="100" controls>
+          <source src="{{ product.video_url }}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      {% else %}
+      N/A
+      {% endif %}
+    </td>
+    <td class="text-center">
+      <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" onsubmit="return confirm('Are you sure?');">
+        {{ delete_form.csrf_token }}
+        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Delete</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+        </table>
+      </div>
+    </section>
+
+    <section id="messages" class="mb-10">
+      <h2 class="text-xl font-bold text-blue-700 mb-4">Contact Messages</h2>
+      <div class="overflow-x-auto bg-white shadow rounded">
+        <table class="min-w-full table-auto">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 text-left">Name</th>
+              <th class="px-4 py-2 text-left">Email</th>
+              <th class="px-4 py-2 text-left">Message</th>
+              <th class="px-4 py-2 text-left">Received</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for msg in messages %}
+            <tr class="border-t">
+              <td class="px-4 py-2">{{ msg.name }}</td>
+              <td class="px-4 py-2">{{ msg.email }}</td>
+              <td class="px-4 py-2">{{ msg.message }}</td>
+              <td class="px-4 py-2">{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="orders">
+  <h2 class="text-xl font-bold text-blue-700 mb-4">Recent Orders</h2>
+  <div class="overflow-x-auto bg-white shadow rounded">
+    <table class="min-w-full table-auto">
+      <thead class="bg-blue-100">
+        <tr>
+          <th class="px-4 py-2 text-left">Order ID</th>
+          <th class="px-4 py-2 text-left">Customer Name</th>
+          <th class="px-4 py-2 text-left">Email</th>
+          <th class="px-4 py-2 text-left">Phone</th>
+          <th class="px-4 py-2 text-left">Address</th>
+          <th class="px-4 py-2 text-left">Items</th>
+          <th class="px-4 py-2 text-right">Total</th>
+          <th class="px-4 py-2 text-left">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Mobile version: show cards instead of table -->
+<div class="md:hidden space-y-4">
+  {% for order in orders %}
+  <div class="bg-white p-4 rounded shadow">
+    <p><strong>Order ID:</strong> {{ order.id }}</p>
+    <p><strong>Name:</strong> {{ order.name }}</p>
+    <p><strong>Email:</strong> {{ order.email }}</p>
+    <p><strong>Phone:</strong> {{ order.phone }}</p>
+    <p><strong>Address:</strong> {{ order.address }}</p>
+    <p><strong>Items:</strong></p>
+    <ul class="list-disc list-inside">
+      {% for item in order.items_list %}
+      <li>{{ item.name }} x {{ item.qty }} - ₹{{ item.price * item.qty }}</li>
+      {% endfor %}
+    </ul>
+    {% if order.lens_power_info %}
+    <p><strong>Lens Power:</strong> {{ order.lens_power_info }}</p>
+    {% endif %}
+    <p><strong>Total:</strong> ₹{{ order.total }}</p>
+    <p><strong>Date:</strong> {{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Desktop version: current table, hidden on small -->
+<div class="hidden md:block overflow-x-auto bg-white shadow rounded">
+  <!-- your current table here -->
+</div>
+
+      </tbody>
+    </table>
+  </div>
+</section>
+
+  </main>
+</body>
+</html>
+
