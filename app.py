@@ -102,7 +102,7 @@ def dashboard():
             p.image_list = []
 
     return render_template(
-        'dashboard'.html,
+        'dashboard.html',
         products=products,
         messages=messages,
         orders=orders,
