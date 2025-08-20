@@ -39,7 +39,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 with app.app_context():
     db.create_all()
     if not Admin.query.first():
-        admin = Admin(username='aheyecare786', password=generate_password_hash('AHeyecare786@'))
+        admin = Admin(username='error786', password=generate_password_hash('Error786@'))
         db.session.add(admin)
         db.session.commit()
 
